@@ -18,14 +18,28 @@ DenseNet详解
 
 ![image](https://github.com/ShaoQiBNU/DenseNet/blob/master/images/1.png)
 
-> 图1是一个详细的dense block模块，其中层数为5即xl(l=0,1,2,3,4)，BN-ReLU-Conv为4即Hl(l=1,2,3,4)，网络增长率为4，即每一个layer输出的feature map的维度（channels）为4。x0是input层——height x width x 6，输进H1，经过BN-ReLU-Conv得到x1——height x width x 4，之后将x0和x1连接起来即concatenation处理——height x width x 10，输进H2，经过BN-ReLU-Conv得到x2——height x width x 4，之后将x0、x1和x2连接起来——height x width x 14，输进H3，经过BN-ReLU-Conv得到x2——height x width x 4，之后将x0、x1、x2和x3连接起来——height x width x 18，输进H4，经过BN-ReLU-Conv得到x4——height x width x 4，之后将x0、x1、x2、x3和x4连接起来——height x width x 22，输进transition layers。
+> 图1是一个详细的dense block模块，其中层数为5即xl(l=0,1,2,3,4)，BN-ReLU-Conv为4即Hl(l=1,2,3,4)，网络增长率为4，即每一个layer输出的feature map的维度（channels）为4。传递过程如下：
+
+```
+x0是input层——height x width x 6，输进H1，经过BN-ReLU-Conv得到x1——height x width x 4
+
+之后将x0和x1连接起来即concatenation处理，通道的合并，像Inception那样——height x width x 10，输进H2，经过BN-ReLU-Conv得到x2——height x width x 4
+
+之后将x0、x1和x2连接起来——height x width x 14，输进H3，经过BN-ReLU-Conv得到x2——height x width x 4
+
+之后将x0、x1、x2和x3连接起来——height x width x 18，输进H4，经过BN-ReLU-Conv得到x4——height x width x 4
+
+之后将x0、x1、x2、x3和x4连接起来——height x width x 22，输进transition layers
+
+```
 
 > 一个DenseNet则由多个这种block组成，每个DenseBlock的之间层称为transition layers，由BN−>Conv−>averagePooling组成，如图所示：
 
 ![image](https://github.com/ShaoQiBNU/DenseNet/blob/master/images/2.png)
 
-> 虽然都是shortcut连接，但是DenseNet与ResNet连接方式不同，ResNet的连接方式是![image](https://github.com/ShaoQiBNU/DenseNet/blob/master/images/3.png)
+> 虽然都是shortcut连接，但是DenseNet与ResNet连接方式不同，ResNet的连接方式是![image](https://github.com/ShaoQiBNU/DenseNet/blob/master/images/3.png)，其优点在于梯度可以直接通过恒等函数从后面的层流向早些时候层。然而，恒等函数和输出H的求和可能会妨碍信息在整个网络中的传播。DenseNet的连接方式是![image](https://github.com/ShaoQiBNU/DenseNet/blob/master/images/4.png)，可以有效
 
+ax^{2}
 
 
 # 三.
