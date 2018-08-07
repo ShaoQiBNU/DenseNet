@@ -39,9 +39,11 @@ x0是input层——height x width x 6，输进H1，经过BN-ReLU-Conv得到x1—
 ![image](https://github.com/ShaoQiBNU/DenseNet/blob/master/images/2.png)
 
 > 虽然都是shortcut连接，但是DenseNet与ResNet连接方式不同，ResNet的连接方式如下，其优点在于梯度可以直接通过恒等函数从后面的层流向早些时候层。然而，恒等函数和输出H的求和可能会妨碍信息在整个网络中的传播。
+
 ![image](https://github.com/ShaoQiBNU/DenseNet/blob/master/images/3.png)
 
 > DenseNet的连接方式如下，可以有效地改善信息流动。
+
 ![image](https://github.com/ShaoQiBNU/DenseNet/blob/master/images/4.png)
 
 ## (二) 结构说明
@@ -72,11 +74,73 @@ Batch Normalization ——> Relu ——> Conv (1 x 1),filters为 4 x k ——> d
 
 ### 3. Transition Layer
 
-> 每两个Dense Block之间的layer即为Transition Layer,作用是降维。因为每个Dense Block结束后的输出channel个数很多，需要用1 x 1的卷积核来降维。还是以DenseNet-169的Dense Block（3）为例，虽然第32层的3 x 3卷积输出channel只有32个（growth rate），但是紧接着还会像前面几层一样有通道的concat操作，即将第32层的输出和第32层的输入做concat，前面说过第32层的输入是1000左右的channel，所以最后每个Dense Block的输出也是1000多的channel。因此这个transition layer有个参数reduction（范围是0到1），表示将这些输出缩小到原来的多少倍，默认是0.5，这样传给下一个Dense Block的时候channel数量就会减少一半，这就是transition layer的作用。
+#### (1) DenseNet和DenseNet-B
 
+> Transition Layer的结构设计如下：
 
+```
+Batch Normalization ——> Relu ——> Conv (1 x 1),filters为 m ——> dropout ——> average pool (2 x 2, stride=2)
+m为Dense Block输出的维度channels
+```
+#### (2) DenseNet-BC
 
-## (三) 
+> 因为每个Dense Block结束后的输出channel个数很多，可以设置参数θ来降维，0 < θ ≤ 1，当θ=1时，Transition Layer的结构同上；当0 < θ < 1，可将filters设置为θ·m，表示将这些输出缩小到原来的多少倍，默认是0.5，从而实现降维。Transition Layer的结构设计如下：
+
+```
+Batch Normalization ——> Relu ——> Conv (1 x 1),filters为 θ·m ——> dropout ——> average pool (2 x 2, stride=2)
+m为Dense Block输出的维度channels   θ为compression factor
+```
+
+## (三) 网络设计
+
+> 论文设计了几种DenseNet-BC网络结构，其中第一层卷积的卷积核设置为 2k，具体参数如图所示：
+
+![image](https://github.com/ShaoQiBNU/DenseNet/blob/master/images/5.png)
+
+> 以DenseNet-121为例对网络传递方式进行分析，过程如下：
+
+> 初始化——卷积和pool
+
+```
+input: 输入 224 x 224 x 3   Growth Rate: k = 32  θ=0.5
+
+conv1: 7 x 7 x 3, filters = 2k = 64, stride = 2   conv -->BN --> Relu   输出 112 x 112 x 64
+
+max pool: 3 x 3, stride = 2   输出 56 x 56 x 64
+
+```
+> Dense Block
+
+```
+具体过程如图所示
+
+Dense Block 1: 输出 56 x 56 x 256
+Transition Layer 1: θ=0.5, m=256, 因此BN --> Relu --> conv 后变为 56 x 56 x 128, 之后average pool(s=2), 输出 28 x 28 x 128
+
+Dense Block 2: 输出 28 x 28 x (128 + 32 x 12) = 28 x 28 x 512
+Transition Layer 2: 输出 14 x 14 x 256
+
+Dense Block 3: 输出 14 x 14 x 1024
+Transition Layer 3: 输出 7 x 7 x 512
+
+Dense Block 4: 输出 7 x 7 x 1024
+
+```
+
+![image](https://github.com/ShaoQiBNU/DenseNet/blob/master/images/6.png)
+
+> Classification layer
+
+```
+global average pool: 输出 1 x 1 x 1024
+
+fc: 1000 种类数，可根据数据集进行调整
+
+softmax: 对fc进行激活函数处理
+
+out: 输出
+
+```
 
 # 三.
 
