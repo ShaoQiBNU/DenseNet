@@ -50,7 +50,7 @@ x0是input层——height x width x 6，输进H1，经过BN-ReLU-Conv得到x1—
 
 ### 1. Growth Rate 
 
-> Growth Rate是Hl函数产生的feature map的数量，即每一个layer输出的feature map的维度。对于第L层layer，其输入的feature map维度为k0+k x (L-1)，k0为input layer的channels，k是Growth Rate。
+> Growth Rate是Hl函数产生的feature map的数量，即每一个layer输出的feature map的维度。对于第L层layer（经过L-1层H函数作用），其输入的feature map维度为k0+k x (L-1)，k0为input layer的channels，k是Growth Rate。
 
 ### 2. Dense Block
 
@@ -80,6 +80,7 @@ Batch Normalization ——> Relu ——> Conv (1 x 1),filters为 4 x k ——> d
 
 ```
 Batch Normalization ——> Relu ——> Conv (1 x 1),filters为 m ——> dropout ——> average pool (2 x 2, stride=2)
+
 m为Dense Block输出的维度channels
 ```
 #### (2) DenseNet-BC
@@ -88,8 +89,12 @@ m为Dense Block输出的维度channels
 
 ```
 Batch Normalization ——> Relu ——> Conv (1 x 1),filters为 θ·m ——> dropout ——> average pool (2 x 2, stride=2)
+
 m为Dense Block输出的维度channels   θ为compression factor
 ```
+
+#### 注意：每一个Dense Block输出影像的维度 = k0+k x nb_layers，k0为上一个Transition Layer输入的维度，k为Growth Rate，nb_layers为该Block的层数，如下图中DenseNet-121，Dense Block有6、12、24和16。 
+
 
 ## (三) 网络设计
 
