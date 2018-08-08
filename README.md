@@ -319,11 +319,11 @@ def transition_block(x, nb_filter, theta, dropout):
     return x
 
 
-########## DenseNet ##########
-def DenseNet(x, nb_dense_block=4, growth_rate=32, nb_filter=64, theta=0.5, dropout=0.0, n_classes=1000):
+########## DenseNet121 ##########
+def DenseNet121(x, nb_dense_block=4, growth_rate=32, nb_filter=64, theta=0.5, dropout=0.0, n_classes=1000):
 
     '''
-    DenseNet: DenseNet
+    DenseNet121: DenseNet121
 
     x: 输入影像
     nb_dense_block: dense block个数，默认为4
@@ -340,7 +340,7 @@ def DenseNet(x, nb_dense_block=4, growth_rate=32, nb_filter=64, theta=0.5, dropo
     x=tf.reshape(x,shape=[-1,28,28,1])
 
 
-    ####### dense block的层数，DenseNet-121各dense block的层数为[6,12,24,16] ########
+    ####### dense block的层数，DenseNet121各dense block的层数为[6,12,24,16] ########
     nb_layers=[6, 12, 24, 16]
 
 
@@ -401,7 +401,7 @@ def DenseNet(x, nb_dense_block=4, growth_rate=32, nb_filter=64, theta=0.5, dropo
 ########## define model, loss and optimizer ##########
 
 #### model pred 影像判断结果 ####
-pred=DenseNet(x, growth_rate=growth_rate, theta=theta, dropout=dropout, n_classes=10)
+pred=DenseNet121(x, growth_rate=growth_rate, theta=theta, dropout=dropout, n_classes=10)
 
 #### loss 损失计算 ####
 cost=tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
@@ -452,5 +452,6 @@ with tf.Session() as sess:
     for _ in range(mnist.test.num_examples//batch_size_test):
         batch_x,batch_y=mnist.test.next_batch(batch_size_test)
         print("Testing Accuracy:", sess.run(accuracy, feed_dict={x: batch_x, y: batch_y}))
+
 
 ```
