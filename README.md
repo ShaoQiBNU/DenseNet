@@ -144,7 +144,7 @@ out: 输出
 
 # 三. 代码
 
-> 论文的代码地址为 https://github.com/liuzhuang13/DenseNet，参考https://github.com/flyyufelix/DenseNet-Keras，利用tensorflow构建DenseNet-121实现MNIST判别，代码如下：
+> 论文的代码地址为 https://github.com/liuzhuang13/DenseNet. 参考https://github.com/flyyufelix/DenseNet-Keras. 利用tensorflow构建DenseNet-121实现MNIST判别，代码如下：
 
 ```python
 
